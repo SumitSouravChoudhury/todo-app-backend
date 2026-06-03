@@ -52,7 +52,7 @@ const handleUpdateTask = async (req, res, next) => {
       { new: true }
     );
     if (!task) return res.status(404).json({ error: 'Task not found' });
-    return res.status(200).json({ task });
+    return res.status(200).json({ message: 'Task updated successfully', task });
   } catch (error) {
     next(error);
   }
