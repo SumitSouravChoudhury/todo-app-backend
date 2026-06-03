@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const authRoute = require('./routes/auth');
 const userRoute = require('./routes/user');
@@ -19,6 +20,7 @@ mongoose
   .then(() => console.log('MongoDB connected!'))
   .catch((err) => console.error(err));
 
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
