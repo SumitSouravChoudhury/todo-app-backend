@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 
 const authRoute = require('./routes/auth');
 const userRoute = require('./routes/user');
+const taskRoute = require('./routes/task');
 const { authenticate } = require('./middlewares/auth');
 const { errorHandler } = require('./middlewares/errorHandler');
 
@@ -23,6 +24,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoute);
 app.use('/api/user', authenticate, userRoute);
+app.use('/api/task', authenticate, taskRoute);
 
 app.use(errorHandler);
 
