@@ -20,7 +20,12 @@ mongoose
   .then(() => console.log('MongoDB connected!'))
   .catch((err) => console.error(err));
 
-app.use(cors());
+app.use(
+  cors({
+    origin: '*',
+    exposedHeaders: ['Authorization'],
+  })
+);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
