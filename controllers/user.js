@@ -1,7 +1,7 @@
-const fs = require('fs');
 const path = require('path');
 
 const User = require('../models/user');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 const handleListAllUsers = async (req, res, next) => {
   try {
@@ -43,12 +43,8 @@ const handleUpdateUser = async (req, res, next) => {
       const safeName = nameForFile.replace(/\s+/g, '_');
       const ext = path.extname(req.file.originalname);
       const baseName = path.basename(req.file.originalname, ext).replace(/\s+/g, '_');
-      const filename = `${userId}-${safeName}-${baseName}${ext}`;
-
-      const uploadDir = path.join(__dirname, '../uploads/profileImages');
-      fs.mkdirSync(uploadDir, { recursive: true });
-      fs.writeFileSync(path.join(uploadDir, filename), req.file.buffer);
-      profileImgUrl = `/uploads/profileImages/${filename}`;
+      const publicId = `${userId}-${safeName}-${baseName}${ext}`;
+      profileImgUrl = await uploadToCloudinary(req.file.buffer, 'profileImages', publicId);
     }
 
     const user = await User.findByIdAndUpdate(

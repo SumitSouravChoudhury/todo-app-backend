@@ -28,7 +28,9 @@ const userSchema = new Schema(
     timestamps: true,
     toJSON: {
       transform: (doc, ret) => {
-        ret.profileImgUrl = `${process.env.BASE_URL}${ret.profileImgUrl}`;
+        if (ret.profileImgUrl && !ret.profileImgUrl.startsWith('http')) {
+          ret.profileImgUrl = `${process.env.BASE_URL}${ret.profileImgUrl}`;
+        }
         return ret;
       },
     },
