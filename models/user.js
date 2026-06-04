@@ -19,6 +19,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    profileImgUrl: {
+      type: String,
+      default: '/images/defaultProfileImage.svg',
+    },
   },
   { timestamps: true }
 );

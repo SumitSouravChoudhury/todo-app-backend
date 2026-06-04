@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 const User = require('../models/user');
 const { createToken } = require('../services/auth');
@@ -16,7 +18,26 @@ const handleUserSignup = async (req, res, next) => {
   const salt = crypto.randomBytes(16).toString('hex');
 
   try {
-    await User.create({ fullName, email, salt, password: hashPassword(password, salt) });
+    const user = await User.create({
+      fullName,
+      email,
+      salt,
+      password: hashPassword(password, salt),
+    });
+
+    if (req.file) {
+      const safeName = fullName.replace(/\s+/g, '_');
+      const ext = path.extname(req.file.originalname);
+      const baseName = path.basename(req.file.originalname, ext).replace(/\s+/g, '_');
+      const filename = `${user._id}-${safeName}-${baseName}${ext}`;
+      const uploadPath = path.join(__dirname, '../uploads/profileImages', filename);
+
+      fs.writeFileSync(uploadPath, req.file.buffer);
+      await User.findByIdAndUpdate(user._id, {
+        profileImgUrl: `/uploads/profileImages/${filename}`,
+      });
+    }
+
     return res.status(201).json({ message: 'User created successfully' });
   } catch (err) {
     next(err);
