@@ -1,10 +1,11 @@
 const { Router } = require('express');
 
 const { handleUserSignup, handleUserSignin } = require('../controllers/auth');
+const profileUpload = require('../utils/profileMulter');
 
 const router = Router();
 
-router.post('/signup', handleUserSignup);
+router.post('/signup', profileUpload.single('profileImg'), handleUserSignup);
 router.post('/login', handleUserSignin);
 
 module.exports = router;
