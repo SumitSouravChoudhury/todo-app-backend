@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const User = require('../models/user');
 
 const handleListAllUsers = async (req, res, next) => {
@@ -25,13 +28,34 @@ const handleUpdateUser = async (req, res, next) => {
   const userId = req.params.userId;
   const { fullName, email } = req.body;
 
-  if (!fullName && !email)
-    return res.status(400).json({ error: 'At least one field (fullName or email) is required' });
+  if (!fullName && !email && !req.file)
+    return res
+      .status(400)
+      .json({ error: 'At least one field (fullName, email, or profileImg) is required' });
 
   try {
+    let profileImgUrl;
+
+    if (req.file) {
+      const nameForFile = fullName || (await User.findById(userId, { fullName: 1 }))?.fullName;
+      if (!nameForFile) return res.status(404).json({ error: 'User not found' });
+
+      const safeName = nameForFile.replace(/\s+/g, '_');
+      const ext = path.extname(req.file.originalname);
+      const baseName = path.basename(req.file.originalname, ext).replace(/\s+/g, '_');
+      const filename = `${userId}-${safeName}-${baseName}${ext}`;
+
+      fs.writeFileSync(path.join(__dirname, '../uploads/profileImages', filename), req.file.buffer);
+      profileImgUrl = `/uploads/profileImages/${filename}`;
+    }
+
     const user = await User.findByIdAndUpdate(
       userId,
-      { ...(fullName && { fullName }), ...(email && { email }) },
+      {
+        ...(fullName && { fullName }),
+        ...(email && { email }),
+        ...(profileImgUrl && { profileImgUrl }),
+      },
       { new: true, projection: { password: 0, salt: 0 } }
     );
     if (!user) return res.status(404).json({ error: 'User not found' });
