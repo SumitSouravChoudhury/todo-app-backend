@@ -30,8 +30,10 @@ const handleUserSignup = async (req, res, next) => {
       const ext = path.extname(req.file.originalname);
       const baseName = path.basename(req.file.originalname, ext).replace(/\s+/g, '_');
       const filename = `${user._id}-${safeName}-${baseName}${ext}`;
-      const uploadPath = path.join(__dirname, '../uploads/profileImages', filename);
+      const uploadDir = path.join(__dirname, '../uploads/profileImages');
+      const uploadPath = path.join(uploadDir, filename);
 
+      fs.mkdirSync(uploadDir, { recursive: true });
       fs.writeFileSync(uploadPath, req.file.buffer);
       await User.findByIdAndUpdate(user._id, {
         profileImgUrl: `/uploads/profileImages/${filename}`,
