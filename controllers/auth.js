@@ -1,9 +1,9 @@
 const crypto = require('crypto');
-const fs = require('fs');
 const path = require('path');
 
 const User = require('../models/user');
 const { createToken } = require('../services/auth');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 const hashPassword = (password, salt) =>
   crypto.createHmac('sha256', salt).update(password).digest('hex');
@@ -29,15 +29,9 @@ const handleUserSignup = async (req, res, next) => {
       const safeName = fullName.replace(/\s+/g, '_');
       const ext = path.extname(req.file.originalname);
       const baseName = path.basename(req.file.originalname, ext).replace(/\s+/g, '_');
-      const filename = `${user._id}-${safeName}-${baseName}${ext}`;
-      const uploadDir = path.join(__dirname, '../uploads/profileImages');
-      const uploadPath = path.join(uploadDir, filename);
-
-      fs.mkdirSync(uploadDir, { recursive: true });
-      fs.writeFileSync(uploadPath, req.file.buffer);
-      await User.findByIdAndUpdate(user._id, {
-        profileImgUrl: `/uploads/profileImages/${filename}`,
-      });
+      const publicId = `${user._id}-${safeName}-${baseName}${ext}`;
+      const profileImgUrl = await uploadToCloudinary(req.file.buffer, 'profileImages', publicId);
+      await User.findByIdAndUpdate(user._id, { profileImgUrl });
     }
 
     return res.status(201).json({ message: 'User created successfully' });
