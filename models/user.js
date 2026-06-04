@@ -24,7 +24,15 @@ const userSchema = new Schema(
       default: '/images/defaultProfileImage.svg',
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret) => {
+        ret.profileImgUrl = `${process.env.BASE_URL}${ret.profileImgUrl}`;
+        return ret;
+      },
+    },
+  }
 );
 
 const User = model('user', userSchema);
