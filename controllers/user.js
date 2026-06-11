@@ -26,12 +26,12 @@ const handleListUserById = async (req, res, next) => {
 
 const handleUpdateUser = async (req, res, next) => {
   const userId = req.params.userId;
-  const { fullName, email } = req.body;
+  const { fullName, email, role } = req.body;
 
-  if (!fullName && !email && !req.file)
+  if (!fullName && !email && !req.file && !role)
     return res
       .status(400)
-      .json({ error: 'At least one field (fullName, email, or profileImg) is required' });
+      .json({ error: 'At least one field (fullName, email, role, or profileImg) is required' });
 
   try {
     let profileImgUrl;
@@ -52,6 +52,7 @@ const handleUpdateUser = async (req, res, next) => {
       {
         ...(fullName && { fullName }),
         ...(email && { email }),
+        ...(role && { role }),
         ...(profileImgUrl && { profileImgUrl }),
       },
       { new: true, projection: { password: 0, salt: 0 } }
