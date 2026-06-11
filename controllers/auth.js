@@ -9,7 +9,7 @@ const hashPassword = (password, salt) =>
   crypto.createHmac('sha256', salt).update(password).digest('hex');
 
 const handleUserSignup = async (req, res, next) => {
-  const { fullName, email, password } = req.body;
+  const { fullName, email, password, role } = req.body;
 
   if (!fullName) return res.status(400).json({ error: 'Full name is required' });
   if (!email) return res.status(400).json({ error: 'Email is required' });
@@ -23,6 +23,7 @@ const handleUserSignup = async (req, res, next) => {
       email,
       salt,
       password: hashPassword(password, salt),
+      role,
     });
 
     if (req.file) {

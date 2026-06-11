@@ -23,6 +23,11 @@ const userSchema = new Schema(
       type: String,
       default: '/images/defaultProfileImage.svg',
     },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
   },
   {
     timestamps: true,
