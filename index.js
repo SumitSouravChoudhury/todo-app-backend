@@ -30,7 +30,6 @@ app.use(
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoute);
 app.use('/api/user', authenticate, userRoute);
@@ -38,4 +37,7 @@ app.use('/api/task', authenticate, taskRoute);
 
 app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Server started at port: ${PORT}`));
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`Server started at port: ${PORT}`));
+}
+module.exports = app;
